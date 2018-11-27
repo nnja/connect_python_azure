@@ -112,3 +112,6 @@ dmypy.json
 
 # Fixtures
 fixtures/
+
+# Secrets file
+.secrets

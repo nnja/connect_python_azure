@@ -2,7 +2,9 @@ import os
 
 from connect_python_azure.settings.shared import *
 
-ALLOWED_HOSTS = ["tweeterapp.azurewebsites.net"]
+# Reading App Service hostname from an environment variable for demo purposes.
+app_service_host = os.environ.get('APP_SERVICE_NAME')
+ALLOWED_HOSTS = [f"{app_service_host}.azurewebsites.net"]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

@@ -16,7 +16,6 @@ isort==4.3.4
 jedi==0.12.1
 lazy-object-proxy==1.3.1
 mccabe==0.6.1
-mysql-connector-python==8.0.12
 nose==1.3.7
 parso==0.3.1
 pep8==1.7.1
