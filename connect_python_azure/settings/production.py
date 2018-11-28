@@ -4,9 +4,7 @@ from connect_python_azure.settings.shared import *
 
 # Reading App Service hostname from an environment variable for demo purposes.
 app_service_host = os.environ.get('APP_SERVICE_NAME')
-ALLOWED_HOSTS = [f"{app_service_host}.azurewebsites.net"]
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+ALLOWED_HOSTS = [f"{app_service_host}.azurewebsites.net", "127.0.0.1"]
 
 
 # Debug mode off in Production
@@ -33,3 +31,14 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+if os.environ.get('SEND_ADMIN_EMAILS'):
+    EMAIL_USE_TLS = True
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+    EMAIL_PORT = 587
+
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL_TO')
+    ADMINS = [('Admin', ADMIN_EMAIL)]
+
