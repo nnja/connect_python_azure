@@ -30,7 +30,7 @@ DJANGO_SETTINGS_MODULE="connect_python_azure.settings.production"
 SECRET_KEY="my-secret-key"
 ```
 
-Configure them in a `.secrets` file, and then `source .secrets`
+Configure them in a `.secrets` file, and then export the secrets with `set -a; source .secrets; set +a`
 
 **Create a production Azure PostgreSQL Server**
 
@@ -54,8 +54,8 @@ az postgres server firewall-rule create --resource-group appsvc_rg_linux_central
 Next, connect to the production postgres server, create the database and configure it for Django.
 
 ```
-psql -v db_password="'$DB_PASSWORD'" -h $DB_HOST.postgres.database.azure.com -U tweeteruser@$DB_HOST postgres
-# Enter your PostgreSQL admin password.
+# Connect to the cloud based PostgreSQL database
+PGPASSWORD=$POSTGRES_ADMIN_PASSWORD psql -v db_password="'$DB_PASSWORD'" -h $DB_HOST.postgres.database.azure.com -U tweeteruser@$DB_HOST postgres
 
 Next run:
 CREATE DATABASE tweeter;
@@ -69,19 +69,45 @@ ALTER ROLE tweeterapp SET timezone TO 'UTC';
 
 Lastly,
 ```
-# export all the environment variables in .secrets
+# make sure all the production secrets are loaded in your current environment
 set -a; source .secrets; set +a
+# run production migrations
 python manage.py migrate
 ```
 
 **Configure Production app settings from file**
-```
+
+In the Visual Studio Code Azure App Service extension, create a new deployment.
+Don't deploy the code just yet.
+
+Next, set up environment variables in the production App Service environment:
+
 # Edit APP_SERVICE_NAME to the name of your deployment.
 # Optionally pipe to /dev/null to avoid printing the secret values in your terminal.
 
-APP_SERVICE_NAME="connect-python-azure-test"
+```
+APP_SERVICE_NAME="connect-python-azure"
 az webapp config appsettings set --resource-group appsvc_rg_linux_centralus --name $APP_SERVICE_NAME --settings $(grep -v '^#' .secrets | xargs)  > /dev/null
+
 # To confirm the secrets were set successfully, run:
 echo $?
 # The value should be 0.
 ```
+
+Next, set the deployment source to local git. Then, go ahead and kick off the deployment.
+
+**Configure Azure Dev Ops from yaml file**
+
+Create two pipelines.
+
+One for CI (Continuous Integration):
+use the source yaml file: .azure-ci-pipeline.yml
+set the environment variables to use for tests:
+DJANGO_SETTINGS_MODULE=connect_python_azure.settings.development
+
+
+One for CD (Continuous Deployment):
+DEPLOYMENT_PASSWORD
+DEPLOYMENT_URL
+DEPLOYMENT_USERNAME
+
